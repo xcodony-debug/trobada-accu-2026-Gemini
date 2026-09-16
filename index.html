@@ -96,17 +96,21 @@
       const any = parts[2] || '';
 
       const update = (newDia, newMes, newAny) => {
-        if (newDia && newMes && newAny) {
-          const dPad = String(newDia).padStart(2, '0');
-          const mPad = String(newMes).padStart(2, '0');
-          onChange(`${dPad}/${mPad}/${newAny}`);
+        const d = newDia !== undefined ? newDia : dia;
+        const m = newMes !== undefined ? newMes : mes;
+        const a = newAny !== undefined ? newAny : any;
+
+        if (d && m && a) {
+          const dPad = String(d).padStart(2, '0');
+          const mPad = String(m).padStart(2, '0');
+          onChange(`${dPad}/${mPad}/${a}`);
         } else {
-          onChange(newAny || newMes || newDia ? `${newDia || ''}/${newMes || ''}/${newAny || ''}` : '');
+          onChange(a || m || d ? `${d}/${m}/${a}` : '');
         }
       };
 
       return (
-        <div class="date-select-group">
+        <div className="date-select-group">
           <select value={dia} onChange={e => update(e.target.value, mes, any)}>
             <option value="">Dia</option>
             {Array.from({length: 31}, (_, i) => i + 1).map(d => (
@@ -134,41 +138,41 @@
     function FormulariaCamps({ data, onChange, isAcompanyant = false }) {
       return (
         <div>
-          <div class="form-grid">
-            <div class="field">
+          <div className="form-grid">
+            <div className="field">
               <label>Nom *</label>
               <input type="text" required placeholder="Ex: Maria" value={data.nom} onChange={e => onChange('nom', e.target.value)} />
             </div>
-            <div class="field">
+            <div className="field">
               <label>Cognoms *</label>
               <input type="text" required placeholder="Ex: Serra i Puig" value={data.cognoms} onChange={e => onChange('cognoms', e.target.value)} />
             </div>
           </div>
 
-          <div class="form-grid">
-            <div class="field">
+          <div className="form-grid">
+            <div className="field">
               <label>DNI / NIE *</label>
               <input type="text" required placeholder="12345678X" value={data.nif} onChange={e => onChange('nif', e.target.value)} />
             </div>
-            <div class="field">
+            <div className="field">
               <label>Data de naixement *</label>
               <SelectorData value={data.dataNaixement} onChange={val => onChange('dataNaixement', val)} />
             </div>
           </div>
 
-          <div class="field">
+          <div className="field">
             <label>És soci/a d'ACCU Catalunya? *</label>
-            <div class="radio-group">
-              <div class={`radio-card ${data.socio === 'Sí' ? 'selected' : ''}`} onClick={() => onChange('socio', 'Sí')}>
+            <div className="radio-group">
+              <div className={`radio-card ${data.socio === 'Sí' ? 'selected' : ''}`} onClick={() => onChange('socio', 'Sí')}>
                 <input type="radio" checked={data.socio === 'Sí'} readOnly />
-                <div class="radio-card-text">
+                <div className="radio-card-text">
                   <strong>Sí, sóc persona sòcia d'ACCU</strong>
                   <span>Quota de soci en regla</span>
                 </div>
               </div>
-              <div class={`radio-card ${data.socio === 'No' ? 'selected' : ''}`} onClick={() => onChange('socio', 'No')}>
+              <div className={`radio-card ${data.socio === 'No' ? 'selected' : ''}`} onClick={() => onChange('socio', 'No')}>
                 <input type="radio" checked={data.socio === 'No'} readOnly />
-                <div class="radio-card-text">
+                <div className="radio-card-text">
                   <strong>Acompanyant</strong>
                   <span>Familiar o persona interessada</span>
                 </div>
@@ -177,19 +181,19 @@
           </div>
 
           {!isAcompanyant && (
-            <div class="form-grid">
-              <div class="field">
+            <div className="form-grid">
+              <div className="field">
                 <label>Telèfon Mòbil *</label>
                 <input type="tel" required placeholder="Ex: 612 345 678" value={data.telefono} onChange={e => onChange('telefono', e.target.value)} />
               </div>
-              <div class="field">
+              <div className="field">
                 <label>Correu Electrònic *</label>
                 <input type="email" required placeholder="Ex: maria.serra@gmail.com" value={data.email} onChange={e => onChange('email', e.target.value)} />
               </div>
             </div>
           )}
 
-          <div class="field">
+          <div className="field">
             <label>Comentaris i observacions</label>
             <textarea rows="2" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
           </div>
@@ -210,24 +214,26 @@
       const [acompanyants, setAcompanyants] = React.useState([]);
 
       const handleTitularChange = (field, value) => {
-        setTitular({ ...titular, [field]: value });
+        setTitular(prev => ({ ...prev, [field]: value }));
       };
 
       const afegirAcompanyant = () => {
-        setAcompanyants([
-          ...acompanyants,
+        setAcompanyants(prev => [
+          ...prev,
           { nom: '', cognoms: '', nif: '', dataNaixement: '', socio: 'No', observacions: '' }
         ]);
       };
 
       const handleAcompanyantChange = (idx, field, value) => {
-        const nous = [...acompanyants];
-        nous[idx][field] = value;
-        setAcompanyants(nous);
+        setAcompanyants(prev => {
+          const nous = [...prev];
+          nous[idx] = { ...nous[idx], [field]: value };
+          return nous;
+        });
       };
 
       const eliminarAcompanyant = (idx) => {
-        setAcompanyants(acompanyants.filter((_, i) => i !== idx));
+        setAcompanyants(prev => prev.filter((_, i) => i !== idx));
       };
 
       const totalPersones = 1 + acompanyants.length;
@@ -309,36 +315,36 @@
       }, [vista]);
 
       return (
-        <div class="app-container">
-          <div class="top-bar">
-            <button class={vista === 'formulari' ? 'active' : ''} onClick={() => setVista('formulari')}>Formulari Públic</button>
-            <button class={vista === 'gestio' ? 'active' : ''} onClick={() => setVista('gestio')}>Gestió Privada</button>
+        <div className="app-container">
+          <div className="top-bar">
+            <button className={vista === 'formulari' ? 'active' : ''} onClick={() => setVista('formulari')}>Formulari Públic</button>
+            <button className={vista === 'gestio' ? 'active' : ''} onClick={() => setVista('gestio')}>Gestió Privada</button>
           </div>
 
           {vista === 'formulari' && (
             <div>
-              <div class="hero-card">
-                <img class="hero-img" src="hotel_cmc_girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
-                <div class="hero-content">
-                  <div class="badge-group">
-                    <span class="badge" style={{background:'#f3e8ff', color:'#7c3aed'}}>ACCU Catalunya — Trobada 2026</span>
-                    <span class="badge">Girona</span>
+              <div className="hero-card">
+                <img className="hero-img" src="hotel_cmc_girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
+                <div className="hero-content">
+                  <div className="badge-group">
+                    <span className="badge" style={{background:'#f3e8ff', color:'#7c3aed'}}>ACCU Catalunya — Trobada 2026</span>
+                    <span className="badge">Girona</span>
                   </div>
-                  <h1 class="hero-title">II Trobada de Persones Sòcies i Famílies</h1>
-                  <p class="hero-desc">Jornades de convivència, tallers i suport mutu per a persones diagnosticades de Crohn, Colitis Ulcerosa i els seus acompanyants.</p>
+                  <h1 className="hero-title">II Trobada de Persones Sòcies i Famílies</h1>
+                  <p className="hero-desc">Jornades de convivència, tallers i suport mutu per a persones diagnosticades de Crohn, Colitis Ulcerosa i els seus acompanyants.</p>
 
-                  <div class="info-grid">
-                    <div class="info-card">
-                      <div class="info-icon">📅</div>
-                      <div class="info-text">
+                  <div className="info-grid">
+                    <div className="info-card">
+                      <div className="info-icon">📅</div>
+                      <div className="info-text">
                         <label>Data de la Trobada</label>
                         <strong>14 i 15 de Novembre</strong>
                         <span>Dissabte i Diumenge</span>
                       </div>
                     </div>
-                    <div class="info-card">
-                      <div class="info-icon">📍</div>
-                      <div class="info-text">
+                    <div className="info-card">
+                      <div className="info-icon">📍</div>
+                      <div className="info-text">
                         <label>Lloc i Allotjament</label>
                         <strong>Hotel Best Western Premier CMC</strong>
                         <span>Girona</span>
@@ -346,7 +352,7 @@
                     </div>
                   </div>
 
-                  <div class="notice-card">
+                  <div className="notice-card">
                     <div style={{fontSize:'20px'}}>💳</div>
                     <span><strong>Reserva de plaça simbòlica de 20 € per persona.</strong><br/>Per confirmar la reserva i l'aforament de cada persona (titular i acompanyants), caldrà abonar una quantitat simbòlica de 20 € per persona. En el correu que rebreu després de fer la reserva <strong>us indicarem</strong> la forma de pagament per reconfirmar les vostres places.</span>
                   </div>
@@ -354,53 +360,53 @@
               </div>
 
               {completat ? (
-                <div class="section-card" style={{textAlign:'center', padding:'40px 20px'}}>
+                <div className="section-card" style={{textAlign:'center', padding:'40px 20px'}}>
                   <div style={{fontSize:'48px', marginBottom:'15px'}}>🎉</div>
                   <h2 style={{color:'var(--primary)'}}>Inscripció Registrada!</h2>
                   <p style={{color:'var(--text-muted)', lineHeight:'1.6'}}>Gràcies per inscriure't a la II Trobada d'ACCU Catalunya. Rebràs un correu electrònic amb les instruccions per fer el pagament de la reserva.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <div class="section-card">
-                    <div class="section-header">
-                      <div class="section-title-wrap">
-                        <div class="step-num">1</div>
+                  <div className="section-card">
+                    <div className="section-header">
+                      <div className="section-title-wrap">
+                        <div className="step-num">1</div>
                         <div>
-                          <h2 class="section-title">Dades de la Persona Titular</h2>
-                          <div class="section-subtitle">Persona de contacte principal que sol·licita la inscripció.</div>
+                          <h2 className="section-title">Dades de la Persona Titular</h2>
+                          <div className="section-subtitle">Persona de contacte principal que sol·licita la inscripció.</div>
                         </div>
                       </div>
-                      <span class="pill-tag">Titular de la reserva</span>
+                      <span className="pill-tag">Titular de la reserva</span>
                     </div>
 
                     <FormulariaCamps data={titular} onChange={handleTitularChange} />
                   </div>
 
-                  <div class="section-card">
-                    <div class="section-header">
-                      <div class="section-title-wrap">
-                        <div class="step-num">2</div>
+                  <div className="section-card">
+                    <div className="section-header">
+                      <div className="section-title-wrap">
+                        <div className="step-num">2</div>
                         <div>
-                          <h2 class="section-title">Persones Acompanyants</h2>
-                          <div class="section-subtitle">Vens acompanyat/da? Inscriu la teva parella, fills o familiars.</div>
+                          <h2 className="section-title">Persones Acompanyants</h2>
+                          <div className="section-subtitle">Vens acompanyat/da? Inscriu la teva parella, fills o familiars.</div>
                         </div>
                       </div>
                     </div>
 
                     {acompanyants.map((acomp, idx) => (
-                      <div key={idx} class="companion-block">
-                        <button type="button" class="remove-btn" onClick={() => eliminarAcompanyant(idx)}>Eliminar</button>
+                      <div key={idx} className="companion-block">
+                        <button type="button" className="remove-btn" onClick={() => eliminarAcompanyant(idx)}>Eliminar</button>
                         <strong style={{display:'block', marginBottom:'15px', color:'var(--primary)', fontSize:'14px'}}>Acompanyant #{idx + 1}</strong>
                         <FormulariaCamps data={acomp} onChange={(f, v) => handleAcompanyantChange(idx, f, v)} isAcompanyant={true} />
                       </div>
                     ))}
 
-                    <button type="button" class="btn-add" onClick={afegirAcompanyant}>
+                    <button type="button" className="btn-add" onClick={afegirAcompanyant}>
                       <span>+</span> Afegir acompanyant
                     </button>
                   </div>
 
-                  <button type="submit" class="btn-submit" disabled={loading}>
+                  <button type="submit" className="btn-submit" disabled={loading}>
                     {loading ? 'Processant reserva...' : `Confirmar i enviar inscripció (Total: ${totalPreu} €)`}
                   </button>
                 </form>
@@ -409,7 +415,7 @@
           )}
 
           {vista === 'gestio' && (
-            <div class="section-card">
+            <div className="section-card">
               <h2>Panell Privat de Gestió</h2>
               {loading ? (
                 <p>Carregant dades...</p>
@@ -427,7 +433,7 @@
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Nom i Cognoms</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>NIF/NIE</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Email</th>
-                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Telèfon</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0فة'}}>Telèfon</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Soci/a</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Data Naixement</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Estat pagament</th>
@@ -435,7 +441,7 @@
                     </thead>
                     <tbody>
                       {inscripcions.slice(1).map((row, idx) => (
-                        <tr key={idx} class={row[8] === 'baixa' ? 'row-baixa' : ''}>
+                        <tr key={idx} className={row[8] === 'baixa' ? 'row-baixa' : ''}>
                           <td style={{padding:'8px', border:'1px solid #e2e8f0', fontWeight:'bold'}}>{row[0]}</td>
                           <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[1]}</td>
                           <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[2]}</td>
