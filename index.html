@@ -86,7 +86,7 @@
   <script type="text/babel">
     const API_URL = 'https://script.google.com/macros/s/AKfycbzv-Yfwoq9FQv11WBChcK0o61wHfbHbmr9VKgZ_rhzW11Py-TzHj20p8Oyk7tplVrsP/exec';
 
-    const MESOS = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Jost', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    const MESOS = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
     const ANYS = Array.from({length: 100}, (_, i) => 2026 - i);
 
     function SelectorData({ value, onChange }) {
@@ -97,8 +97,8 @@
 
       const update = (newDia, newMes, newAny) => {
         if (newDia && newMes && newAny) {
-          const dPad = newDia.padStart(2, '0');
-          const mPad = newMes.padStart(2, '0');
+          const dPad = String(newDia).padStart(2, '0');
+          const mPad = String(newMes).padStart(2, '0');
           onChange(`${dPad}/${mPad}/${newAny}`);
         } else {
           onChange('');
@@ -188,6 +188,11 @@
               </div>
             </div>
           )}
+
+          <div class="field">
+            <label>Comentaris i observacions</label>
+            <textarea rows="2" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
+          </div>
         </div>
       );
     }
@@ -201,7 +206,7 @@
       const [completat, setCompletat] = React.useState(false);
 
       const [titular, setTitular] = React.useState({
-        nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', socio: 'Sí'
+        nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', socio: 'Sí', observacions: ''
       });
 
       const [acompanyants, setAcompanyants] = React.useState([]);
@@ -213,7 +218,7 @@
       const afegirAcompanyant = () => {
         setAcompanyants([
           ...acompanyants,
-          { nom: '', cognoms: '', nif: '', dataNaixement: '', socio: 'No' }
+          { nom: '', cognoms: '', nif: '', dataNaixement: '', socio: 'No', observacions: '' }
         ]);
       };
 
@@ -247,7 +252,8 @@
                 email: titular.email,
                 telefono: titular.telefono,
                 socio: titular.socio,
-                dataNaixement: titular.dataNaixement
+                dataNaixement: titular.dataNaixement,
+                totalPreu: totalPreu
               }
             })
           });
