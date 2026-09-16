@@ -73,6 +73,8 @@
     .top-bar button { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 13px; }
     .top-bar button.active { color: var(--primary); text-decoration: underline; }
 
+    .row-baixa { background-color: #fce8e6 !important; color: #c5221f; }
+
     @media (max-width: 600px) {
       .info-grid, .form-grid, .radio-group { grid-template-columns: 1fr; }
     }
@@ -88,16 +90,16 @@
     const ANYS = Array.from({length: 100}, (_, i) => 2026 - i);
 
     function SelectorData({ value, onChange }) {
-      const parts = value ? value.split('-') : ['', '', ''];
-      const any = parts[0] || '';
+      const parts = value ? value.split('/') : ['', '', ''];
+      const dia = parts[0] || '';
       const mes = parts[1] || '';
-      const dia = parts[2] || '';
+      const any = parts[2] || '';
 
       const update = (newDia, newMes, newAny) => {
         if (newDia && newMes && newAny) {
           const dPad = newDia.padStart(2, '0');
           const mPad = newMes.padStart(2, '0');
-          onChange(`${newAny}-${mPad}-${dPad}`);
+          onChange(`${dPad}/${mPad}/${newAny}`);
         } else {
           onChange('');
         }
@@ -151,7 +153,6 @@
             <div class="field">
               <label>Data de naixement *</label>
               <SelectorData value={data.dataNaixement} onChange={val => onChange('dataNaixement', val)} />
-              {data.edatCalculada !== '' && <small style={{color:'var(--primary)', fontWeight:'600', marginTop:'4px', display:'block'}}>Edat: {data.edatCalculada} anys</small>}
             </div>
           </div>
 
@@ -187,11 +188,6 @@
               </div>
             </div>
           )}
-
-          <div class="field">
-            <label>Comentaris i observacions</label>
-            <textarea rows="2" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
-          </div>
         </div>
       );
     }
@@ -205,39 +201,25 @@
       const [completat, setCompletat] = React.useState(false);
 
       const [titular, setTitular] = React.useState({
-        nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', edatCalculada: '',
-        socio: 'Sí', observacions: ''
+        nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', socio: 'Sí'
       });
 
       const [acompanyants, setAcompanyants] = React.useState([]);
 
-      const calcularEdat = (dataNaix) => {
-        if (!dataNaix) return '';
-        const avui = new Date();
-        const naixement = new Date(dataNaix);
-        let edat = avui.getFullYear() - naixement.getFullYear();
-        const mes = avui.getMonth() - naixement.getMonth();
-        if (mes < 0 || (mes === 0 && avui.getDate() < naixement.getDate())) edat--;
-        return edat;
-      };
-
       const handleTitularChange = (field, value) => {
-        const updated = { ...titular, [field]: value };
-        if (field === 'dataNaixement') updated.edatCalculada = calcularEdat(value);
-        setTitular(updated);
+        setTitular({ ...titular, [field]: value });
       };
 
       const afegirAcompanyant = () => {
         setAcompanyants([
           ...acompanyants,
-          { nom: '', cognoms: '', nif: '', dataNaixement: '', edatCalculada: '', socio: 'No', observacions: '' }
+          { nom: '', cognoms: '', nif: '', dataNaixement: '', socio: 'No' }
         ]);
       };
 
       const handleAcompanyantChange = (idx, field, value) => {
         const nous = [...acompanyants];
         nous[idx][field] = value;
-        if (field === 'dataNaixement') nous[idx].edatCalculada = calcularEdat(value);
         setAcompanyants(nous);
       };
 
@@ -251,7 +233,7 @@
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const idGrup = 'grup-' + Date.now();
+
         const nomCompletTitular = `${titular.nom} ${titular.cognoms}`.trim();
 
         try {
@@ -265,12 +247,7 @@
                 email: titular.email,
                 telefono: titular.telefono,
                 socio: titular.socio,
-                dataNaixement: titular.dataNaixement,
-                edatCalculada: titular.edatCalculada,
-                observacionsGenerals: titular.observacions,
-                tipusPersona: 'titular',
-                idGrup: idGrup,
-                nomTitular: nomCompletTitular
+                dataNaixement: titular.dataNaixement
               }
             })
           });
@@ -287,12 +264,7 @@
                   email: titular.email,
                   telefono: titular.telefono,
                   socio: acomp.socio,
-                  dataNaixement: acomp.dataNaixement,
-                  edatCalculada: acomp.edatCalculada,
-                  observacionsGenerals: acomp.observacions,
-                  tipusPersona: 'acompanyant',
-                  idGrup: idGrup,
-                  nomTitular: nomCompletTitular
+                  dataNaixement: acomp.dataNaixement
                 }
               })
             });
@@ -441,21 +413,29 @@
                   <table style={{width:'100%', borderCollapse:'collapse', fontSize:'13px'}}>
                     <thead>
                       <tr style={{background:'#f1f5f9'}}>
-                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Nom</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>ID</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Data Registre</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Nom i Cognoms</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>NIF/NIE</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Email</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Telèfon</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Soci/a</th>
                         <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Data Naixement</th>
-                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Edat</th>
-                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Tipus</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Estat pagament</th>
                       </tr>
                     </thead>
                     <tbody>
                       {inscripcions.slice(1).map((row, idx) => (
-                        <tr key={idx}>
+                        <tr key={idx} class={row[8] === 'baixa' ? 'row-baixa' : ''}>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0', fontWeight:'bold'}}>{row[0]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[1]}</td>
                           <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[2]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[3]}</td>
                           <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[4]}</td>
-                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[40]}</td>
-                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[31]}</td>
-                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[32]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[5]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[6]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[7]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[8]}</td>
                         </tr>
                       ))}
                     </tbody>
