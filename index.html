@@ -293,10 +293,10 @@
           if (data.success) {
             setInscripcions(data.data);
           } else {
-            alert('Error al carregar les dades');
+            alert('Error del servidor: ' + (data.error || 'Desconegut'));
           }
         } catch (err) {
-          alert('Error de connexió');
+          alert('Error de connexió amb l\'API');
         } finally {
           setLoading(false);
         }
