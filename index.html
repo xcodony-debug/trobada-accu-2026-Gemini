@@ -199,8 +199,6 @@
 
     function App() {
       const [vista, setVista] = React.useState('formulari');
-      const [password, setPassword] = React.useState('');
-      const [autenticat, setAutenticat] = React.useState(false);
       const [inscripcions, setInscripcions] = React.useState([]);
       const [loading, setLoading] = React.useState(false);
       const [completat, setCompletat] = React.useState(false);
@@ -289,14 +287,13 @@
         try {
           const res = await fetch(API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'obtenirInscripcions', password })
+            body: JSON.stringify({ action: 'obtenirInscripcions' })
           });
           const data = await res.json();
           if (data.success) {
             setInscripcions(data.data);
-            setAutenticat(true);
           } else {
-            alert('Contrasenya incorrecta');
+            alert('Error al carregar les dades');
           }
         } catch (err) {
           alert('Error de connexió');
@@ -304,6 +301,12 @@
           setLoading(false);
         }
       };
+
+      React.useEffect(() => {
+        if (vista === 'gestio') {
+          carregarDadesGestor();
+        }
+      }, [vista]);
 
       return (
         <div class="app-container">
@@ -408,14 +411,14 @@
           {vista === 'gestio' && (
             <div class="section-card">
               <h2>Panell Privat de Gestió</h2>
-              {!autenticat ? (
-                <div style={{display:'flex', gap:'10px'}}>
-                  <input type="password" placeholder="Contrasenya" value={password} onChange={e => setPassword(e.target.value)} style={{padding:'10px', borderRadius:'8px', border:'1px solid #ccc', flex:1}} />
-                  <button onClick={carregarDadesGestor} style={{background:'var(--primary)', color:'#fff', border:'none', padding:'10px 20px', borderRadius:'8px', cursor:'pointer'}} disabled={loading}>{loading ? 'Entrant...' : 'Entrar'}</button>
-                </div>
+              {loading ? (
+                <p>Carregant dades...</p>
               ) : (
                 <div style={{overflowX:'auto'}}>
-                  <p>Inscripcions totals: {inscripcions.length > 0 ? inscripcions.length - 1 : 0}</p>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'15px'}}>
+                    <p style={{margin:0}}>Inscripcions totals: {inscripcions.length > 0 ? inscripcions.length - 1 : 0}</p>
+                    <button onClick={carregarDadesGestor} style={{background:'var(--primary)', color:'#fff', border:'none', padding:'8px 15px', borderRadius:'6px', cursor:'pointer', fontSize:'12px'}}>Actualitzar llista</button>
+                  </div>
                   <table style={{width:'100%', borderCollapse:'collapse', fontSize:'13px'}}>
                     <thead>
                       <tr style={{background:'#f1f5f9'}}>
