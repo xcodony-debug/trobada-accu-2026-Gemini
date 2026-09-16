@@ -101,27 +101,27 @@
           const mPad = String(newMes).padStart(2, '0');
           onChange(`${dPad}/${mPad}/${newAny}`);
         } else {
-          onChange('');
+          onChange(newAny || newMes || newDia ? `${newDia || ''}/${newMes || ''}/${newAny || ''}` : '');
         }
       };
 
       return (
         <div class="date-select-group">
-          <select value={dia} onChange={e => update(e.target.value, mes, any)} required>
+          <select value={dia} onChange={e => update(e.target.value, mes, any)}>
             <option value="">Dia</option>
             {Array.from({length: 31}, (_, i) => i + 1).map(d => (
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
 
-          <select value={mes} onChange={e => update(dia, e.target.value, any)} required>
+          <select value={mes} onChange={e => update(dia, e.target.value, any)}>
             <option value="">Mes</option>
             {MESOS.map((m, idx) => (
               <option key={idx + 1} value={idx + 1}>{m}</option>
             ))}
           </select>
 
-          <select value={any} onChange={e => update(dia, mes, e.target.value)} required>
+          <select value={any} onChange={e => update(dia, mes, e.target.value)}>
             <option value="">Any</option>
             {ANYS.map(a => (
               <option key={a} value={a}>{a}</option>
