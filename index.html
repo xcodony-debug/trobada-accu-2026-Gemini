@@ -248,6 +248,7 @@
         try {
           await fetch(API_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               action: 'inscriure',
               data: {
@@ -266,6 +267,7 @@
             const nomCompletAcomp = `${acomp.nom} ${acomp.cognoms}`.trim();
             await fetch(API_URL, {
               method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
               body: JSON.stringify({
                 action: 'inscriure',
                 data: {
@@ -293,6 +295,7 @@
         try {
           const res = await fetch(API_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'obtenirInscripcions' })
           });
           const data = await res.json();
