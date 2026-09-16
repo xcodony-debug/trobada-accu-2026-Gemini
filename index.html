@@ -22,7 +22,7 @@
     .app-container { max-width: 720px; margin: 0 auto; }
     
     .hero-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .hero-img { width: 100%; height: 260px; object-fit: cover; display: block; }
+    .hero-img { width: 100%; height: 280px; object-fit: cover; display: block; }
     .hero-content { padding: 25px; }
     .badge-group { display: flex; gap: 8px; margin-bottom: 12px; }
     .badge { background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
@@ -52,10 +52,8 @@
     .field label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #334155; }
     .field input, .field select, .field textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fff; }
     
-    /* Selector de Data Intuitiu */
     .date-select-group { display: grid; grid-template-columns: 1fr 1.5fr 1.2fr; gap: 8px; }
 
-    /* Fix Caixes de Radio Button */
     .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
     .radio-card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; background: #ffffff; }
     .radio-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 1px var(--primary); }
@@ -170,7 +168,7 @@
               <div class={`radio-card ${data.socio === 'No' ? 'selected' : ''}`} onClick={() => onChange('socio', 'No')}>
                 <input type="radio" checked={data.socio === 'No'} readOnly />
                 <div class="radio-card-text">
-                  <strong>No sóc soci/a (Acompanyant / No soci)</strong>
+                  <strong>Acompanyant</strong>
                   <span>Familiar o persona interessada</span>
                 </div>
               </div>
@@ -191,17 +189,8 @@
           )}
 
           <div class="field">
-            <label>Tipus d'Allotjament Preferit</label>
-            <select value={data.tipusAllotjament} onChange={e => onChange('tipusAllotjament', e.target.value)}>
-              <option value="doble">Habitació Doble</option>
-              <option value="individual">Habitació Individual</option>
-              <option value="sense_allotjament">Sense Allotjament (Només activitats)</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Observacions o necessitats dietètriques / especials</label>
-            <textarea rows="2" placeholder="Cel·liaquia, intoleràncies, al·lèrgies, mobilitat reduïda..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
+            <label>Comentaris i observacions</label>
+            <textarea rows="2" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
           </div>
         </div>
       );
@@ -217,7 +206,7 @@
 
       const [titular, setTitular] = React.useState({
         nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', edatCalculada: '',
-        socio: 'Sí', tipusAllotjament: 'doble', observacions: ''
+        socio: 'Sí', observacions: ''
       });
 
       const [acompanyants, setAcompanyants] = React.useState([]);
@@ -241,7 +230,7 @@
       const afegirAcompanyant = () => {
         setAcompanyants([
           ...acompanyants,
-          { nom: '', cognoms: '', nif: '', dataNaixement: '', edatCalculada: '', socio: 'No', tipusAllotjament: 'doble', observacions: '' }
+          { nom: '', cognoms: '', nif: '', dataNaixement: '', edatCalculada: '', socio: 'No', observacions: '' }
         ]);
       };
 
@@ -266,7 +255,6 @@
         const nomCompletTitular = `${titular.nom} ${titular.cognoms}`.trim();
 
         try {
-          // Guardar Titular
           await fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify({
@@ -277,7 +265,6 @@
                 email: titular.email,
                 telefono: titular.telefono,
                 socio: titular.socio,
-                tipusAllotjament: titular.tipusAllotjament,
                 dataNaixement: titular.dataNaixement,
                 edatCalculada: titular.edatCalculada,
                 observacionsGenerals: titular.observacions,
@@ -288,7 +275,6 @@
             })
           });
 
-          // Guardar Acompanyants amb les mateixes dades completes
           for (const acomp of acompanyants) {
             const nomCompletAcomp = `${acomp.nom} ${acomp.cognoms}`.trim();
             await fetch(API_URL, {
@@ -301,7 +287,6 @@
                   email: titular.email,
                   telefono: titular.telefono,
                   socio: acomp.socio,
-                  tipusAllotjament: acomp.tipusAllotjament,
                   dataNaixement: acomp.dataNaixement,
                   edatCalculada: acomp.edatCalculada,
                   observacionsGenerals: acomp.observacions,
@@ -352,7 +337,7 @@
           {vista === 'formulari' && (
             <div>
               <div class="hero-card">
-                <img class="hero-img" src="https://accucat.org/wp-content/uploads/2023/09/hotel-cmc-girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
+                <img class="hero-img" src="hotel_cmc_girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
                 <div class="hero-content">
                   <div class="badge-group">
                     <span class="badge" style={{background:'#f3e8ff', color:'#7c3aed'}}>ACCU Catalunya — Trobada 2026</span>
