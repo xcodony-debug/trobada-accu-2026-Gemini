@@ -21,16 +21,14 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 15px; background: var(--bg-page); color: var(--text-main); }
     .app-container { max-width: 720px; margin: 0 auto; }
     
-    /* Header Card */
     .hero-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .hero-img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .hero-img { width: 100%; height: 260px; object-fit: cover; display: block; }
     .hero-content { padding: 25px; }
     .badge-group { display: flex; gap: 8px; margin-bottom: 12px; }
     .badge { background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
     .hero-title { font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0; }
     .hero-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.5; }
     
-    /* Info Cards Grid */
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
     .info-card { background: var(--primary-light); border: 1px solid var(--primary-border); padding: 15px; border-radius: 12px; display: flex; gap: 12px; align-items: center; }
     .info-icon { font-size: 20px; background: #ffffff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -41,7 +39,6 @@
     .notice-card { background: var(--primary-light); border: 1px solid var(--primary-border); padding: 15px; border-radius: 12px; display: flex; gap: 12px; }
     .notice-card span { font-size: 13px; color: #4c1d95; line-height: 1.4; }
 
-    /* Section Cards */
     .section-card { background: var(--card-bg); border-radius: var(--radius); padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .section-title-wrap { display: flex; align-items: center; gap: 12px; }
@@ -50,31 +47,30 @@
     .section-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .pill-tag { background: #f1f5f9; color: var(--primary); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
 
-    /* Form Fields */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
     .field { margin-bottom: 15px; }
     .field label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #334155; }
     .field input, .field select, .field textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fff; }
-    .field input:focus, .field select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
     
-    /* Radio Option Cards */
-    .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-    .radio-card { border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; gap: 10px; align-items: flex-start; transition: all 0.2s; }
-    .radio-card.selected { border-color: var(--primary); background: var(--primary-light); }
-    .radio-card input { margin-top: 3px; }
-    .radio-card-text strong { display: block; font-size: 13px; color: #0f172a; }
+    /* Selector de Data Intuitiu */
+    .date-select-group { display: grid; grid-template-columns: 1fr 1.5fr 1.2fr; gap: 8px; }
+
+    /* Fix Caixes de Radio Button */
+    .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .radio-card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; background: #ffffff; }
+    .radio-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 1px var(--primary); }
+    .radio-card input[type="radio"] { margin: 0; width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
+    .radio-card-text { display: flex; flex-direction: column; gap: 2px; }
+    .radio-card-text strong { font-size: 13px; color: #0f172a; line-height: 1.2; }
     .radio-card-text span { font-size: 11px; color: var(--text-muted); }
 
-    /* Companion Block */
-    .companion-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
-    .remove-btn { position: absolute; top: 12px; right: 12px; background: transparent; color: #ef4444; border: none; cursor: pointer; font-size: 18px; font-weight: bold; }
+    .companion-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
+    .remove-btn { position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-    /* Buttons */
-    .btn-add { background: var(--primary-light); color: var(--primary); border: 1px dashed var(--primary); padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-submit { background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 16px; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); }
+    .btn-add { background: var(--primary-light); color: var(--primary); border: 1px dashed var(--primary); padding: 12px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-submit { background: var(--primary); color: #fff; border: none; padding: 16px; border-radius: 10px; font-weight: 700; font-size: 16px; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); margin-top: 10px; }
     .btn-submit:disabled { background: #94a3b8; box-shadow: none; }
     
-    /* Nav & Tabs */
     .top-bar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
     .top-bar button { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 13px; }
     .top-bar button.active { color: var(--primary); text-decoration: underline; }
@@ -90,6 +86,127 @@
   <script type="text/babel">
     const API_URL = 'https://script.google.com/macros/s/AKfycbzv-Yfwoq9FQv11WBChcK0o61wHfbHbmr9VKgZ_rhzW11Py-TzHj20p8Oyk7tplVrsP/exec';
 
+    const MESOS = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Jost', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    const ANYS = Array.from({length: 100}, (_, i) => 2026 - i);
+
+    function SelectorData({ value, onChange }) {
+      const parts = value ? value.split('-') : ['', '', ''];
+      const any = parts[0] || '';
+      const mes = parts[1] || '';
+      const dia = parts[2] || '';
+
+      const update = (newDia, newMes, newAny) => {
+        if (newDia && newMes && newAny) {
+          const dPad = newDia.padStart(2, '0');
+          const mPad = newMes.padStart(2, '0');
+          onChange(`${newAny}-${mPad}-${dPad}`);
+        } else {
+          onChange('');
+        }
+      };
+
+      return (
+        <div class="date-select-group">
+          <select value={dia} onChange={e => update(e.target.value, mes, any)} required>
+            <option value="">Dia</option>
+            {Array.from({length: 31}, (_, i) => i + 1).map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+
+          <select value={mes} onChange={e => update(dia, e.target.value, any)} required>
+            <option value="">Mes</option>
+            {MESOS.map((m, idx) => (
+              <option key={idx + 1} value={idx + 1}>{m}</option>
+            ))}
+          </select>
+
+          <select value={any} onChange={e => update(dia, mes, e.target.value)} required>
+            <option value="">Any</option>
+            {ANYS.map(a => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    function FormulariaCamps({ data, onChange, isAcompanyant = false }) {
+      return (
+        <div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Nom *</label>
+              <input type="text" required placeholder="Ex: Maria" value={data.nom} onChange={e => onChange('nom', e.target.value)} />
+            </div>
+            <div class="field">
+              <label>Cognoms *</label>
+              <input type="text" required placeholder="Ex: Serra i Puig" value={data.cognoms} onChange={e => onChange('cognoms', e.target.value)} />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>DNI / NIE *</label>
+              <input type="text" required placeholder="12345678X" value={data.nif} onChange={e => onChange('nif', e.target.value)} />
+            </div>
+            <div class="field">
+              <label>Data de naixement *</label>
+              <SelectorData value={data.dataNaixement} onChange={val => onChange('dataNaixement', val)} />
+              {data.edatCalculada !== '' && <small style={{color:'var(--primary)', fontWeight:'600', marginTop:'4px', display:'block'}}>Edat: {data.edatCalculada} anys</small>}
+            </div>
+          </div>
+
+          <div class="field">
+            <label>És soci/a d'ACCU Catalunya? *</label>
+            <div class="radio-group">
+              <div class={`radio-card ${data.socio === 'Sí' ? 'selected' : ''}`} onClick={() => onChange('socio', 'Sí')}>
+                <input type="radio" checked={data.socio === 'Sí'} readOnly />
+                <div class="radio-card-text">
+                  <strong>Sí, sóc persona sòcia d'ACCU</strong>
+                  <span>Quota de soci en regla</span>
+                </div>
+              </div>
+              <div class={`radio-card ${data.socio === 'No' ? 'selected' : ''}`} onClick={() => onChange('socio', 'No')}>
+                <input type="radio" checked={data.socio === 'No'} readOnly />
+                <div class="radio-card-text">
+                  <strong>No sóc soci/a (Acompanyant / No soci)</strong>
+                  <span>Familiar o persona interessada</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {!isAcompanyant && (
+            <div class="form-grid">
+              <div class="field">
+                <label>Telèfon Mòbil *</label>
+                <input type="tel" required placeholder="Ex: 612 345 678" value={data.telefono} onChange={e => onChange('telefono', e.target.value)} />
+              </div>
+              <div class="field">
+                <label>Correu Electrònic *</label>
+                <input type="email" required placeholder="Ex: maria.serra@gmail.com" value={data.email} onChange={e => onChange('email', e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          <div class="field">
+            <label>Tipus d'Allotjament Preferit</label>
+            <select value={data.tipusAllotjament} onChange={e => onChange('tipusAllotjament', e.target.value)}>
+              <option value="doble">Habitació Doble</option>
+              <option value="individual">Habitació Individual</option>
+              <option value="sense_allotjament">Sense Allotjament (Només activitats)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Observacions o necessitats dietètriques / especials</label>
+            <textarea rows="2" placeholder="Cel·liaquia, intoleràncies, al·lèrgies, mobilitat reduïda..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
+          </div>
+        </div>
+      );
+    }
+
     function App() {
       const [vista, setVista] = React.useState('formulari');
       const [password, setPassword] = React.useState('');
@@ -98,10 +215,12 @@
       const [loading, setLoading] = React.useState(false);
       const [completat, setCompletat] = React.useState(false);
 
-      const [formData, setFormData] = React.useState({
+      const [titular, setTitular] = React.useState({
         nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', edatCalculada: '',
-        socio: 'Sí', numSocio: '', observacions: '', acompanyants: []
+        socio: 'Sí', tipusAllotjament: 'doble', observacions: ''
       });
+
+      const [acompanyants, setAcompanyants] = React.useState([]);
 
       const calcularEdat = (dataNaix) => {
         if (!dataNaix) return '';
@@ -113,51 +232,55 @@
         return edat;
       };
 
-      const handleDataNaixementTitular = (d) => {
-        setFormData({ ...formData, dataNaixement: d, edatCalculada: calcularEdat(d) });
+      const handleTitularChange = (field, value) => {
+        const updated = { ...titular, [field]: value };
+        if (field === 'dataNaixement') updated.edatCalculada = calcularEdat(value);
+        setTitular(updated);
       };
 
       const afegirAcompanyant = () => {
-        setFormData({
-          ...formData,
-          acompanyants: [...formData.acompanyants, { nom: '', cognoms: '', dataNaixement: '', edatCalculada: '', nif: '' }]
-        });
+        setAcompanyants([
+          ...acompanyants,
+          { nom: '', cognoms: '', nif: '', dataNaixement: '', edatCalculada: '', socio: 'No', tipusAllotjament: 'doble', observacions: '' }
+        ]);
       };
 
-      const actualitzarAcompanyant = (idx, field, value) => {
-        const nousAcomp = [...formData.acompanyants];
-        nousAcomp[idx][field] = value;
-        if (field === 'dataNaixement') {
-          nousAcomp[idx].edatCalculada = calcularEdat(value);
-        }
-        setFormData({ ...formData, acompanyants: nousAcomp });
+      const handleAcompanyantChange = (idx, field, value) => {
+        const nous = [...acompanyants];
+        nous[idx][field] = value;
+        if (field === 'dataNaixement') nous[idx].edatCalculada = calcularEdat(value);
+        setAcompanyants(nous);
       };
 
       const eliminarAcompanyant = (idx) => {
-        setFormData({ ...formData, acompanyants: formData.acompanyants.filter((_, i) => i !== idx) });
+        setAcompanyants(acompanyants.filter((_, i) => i !== idx));
       };
+
+      const totalPersones = 1 + acompanyants.length;
+      const totalPreu = totalPersones * 20;
 
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         const idGrup = 'grup-' + Date.now();
-        const nomCompletTitular = `${formData.nom} ${formData.cognoms}`.trim();
+        const nomCompletTitular = `${titular.nom} ${titular.cognoms}`.trim();
 
         try {
-          // Enviar Titular
+          // Guardar Titular
           await fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify({
               action: 'inscriure',
               data: {
                 nomCognoms: nomCompletTitular,
-                nif: formData.nif,
-                email: formData.email,
-                telefono: formData.telefono,
-                socio: formData.socio,
-                dataNaixement: formData.dataNaixement,
-                edatCalculada: formData.edatCalculada,
-                observacionsGenerals: formData.observacions,
+                nif: titular.nif,
+                email: titular.email,
+                telefono: titular.telefono,
+                socio: titular.socio,
+                tipusAllotjament: titular.tipusAllotjament,
+                dataNaixement: titular.dataNaixement,
+                edatCalculada: titular.edatCalculada,
+                observacionsGenerals: titular.observacions,
                 tipusPersona: 'titular',
                 idGrup: idGrup,
                 nomTitular: nomCompletTitular
@@ -165,8 +288,8 @@
             })
           });
 
-          // Enviar Acompanyants
-          for (const acomp of formData.acompanyants) {
+          // Guardar Acompanyants amb les mateixes dades completes
+          for (const acomp of acompanyants) {
             const nomCompletAcomp = `${acomp.nom} ${acomp.cognoms}`.trim();
             await fetch(API_URL, {
               method: 'POST',
@@ -175,10 +298,13 @@
                 data: {
                   nomCognoms: nomCompletAcomp,
                   nif: acomp.nif,
-                  email: formData.email,
-                  telefono: formData.telefono,
+                  email: titular.email,
+                  telefono: titular.telefono,
+                  socio: acomp.socio,
+                  tipusAllotjament: acomp.tipusAllotjament,
                   dataNaixement: acomp.dataNaixement,
                   edatCalculada: acomp.edatCalculada,
+                  observacionsGenerals: acomp.observacions,
                   tipusPersona: 'acompanyant',
                   idGrup: idGrup,
                   nomTitular: nomCompletTitular
@@ -225,9 +351,8 @@
 
           {vista === 'formulari' && (
             <div>
-              {/* Header Hero Card */}
               <div class="hero-card">
-                <img class="hero-img" src="https://accucat.org/wp-content/uploads/2023/09/hotel-cmc-girona.jpg" alt="Hotel CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
+                <img class="hero-img" src="https://accucat.org/wp-content/uploads/2023/09/hotel-cmc-girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
                 <div class="hero-content">
                   <div class="badge-group">
                     <span class="badge" style={{background:'#f3e8ff', color:'#7c3aed'}}>ACCU Catalunya — Trobada 2026</span>
@@ -257,7 +382,7 @@
 
                   <div class="notice-card">
                     <div style={{fontSize:'20px'}}>💳</div>
-                    <span><strong>Reserva de plaça simbòlica de 20 € per persona.</strong><br/>Per confirmar la reserva i l'aforament de cada persona (titular i acompanyants), caldrà abonar una quantitat simbòlica de 20 € per persona. En el correu que rebreu després de fer la reserva se us indicarà la forma de pagament per reconfirmar les vostres places.</span>
+                    <span><strong>Reserva de plaça simbòlica de 20 € per persona.</strong><br/>Per confirmar la reserva i l'aforament de cada persona (titular i acompanyants), caldrà abonar una quantitat simbòlica de 20 € per persona. En el correu que rebreu després de fer la reserva <strong>us indicarem</strong> la forma de pagament per reconfirmar les vostres places.</span>
                   </div>
                 </div>
               </div>
@@ -270,7 +395,6 @@
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  {/* Pas 1: Dades Titular */}
                   <div class="section-card">
                     <div class="section-header">
                       <div class="section-title-wrap">
@@ -283,103 +407,25 @@
                       <span class="pill-tag">Titular de la reserva</span>
                     </div>
 
-                    <div class="form-grid">
-                      <div class="field">
-                        <label>Nom *</label>
-                        <input type="text" required placeholder="Ex: Maria" value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})} />
-                      </div>
-                      <div class="field">
-                        <label>Cognoms *</label>
-                        <input type="text" required placeholder="Ex: Serra i Puig" value={formData.cognoms} onChange={e => setFormData({...formData, cognoms: e.target.value})} />
-                      </div>
-                    </div>
-
-                    <div class="form-grid">
-                      <div class="field">
-                        <label>DNI / NIE *</label>
-                        <input type="text" required placeholder="12345678X" value={formData.nif} onChange={e => setFormData({...formData, nif: e.target.value})} />
-                      </div>
-                      <div class="field">
-                        <label>Data de naixement *</label>
-                        <input type="date" required value={formData.dataNaixement} onChange={e => handleDataNaixementTitular(e.target.value)} />
-                        {formData.edatCalculada !== '' && <small style={{color:'var(--primary)', fontWeight:'600'}}>Edat: {formData.edatCalculada} anys</small>}
-                      </div>
-                    </div>
-
-                    <div class="field">
-                      <label>És soci/a d'ACCU Catalunya? *</label>
-                      <div class="radio-group">
-                        <div class={`radio-card ${formData.socio === 'Sí' ? 'selected' : ''}`} onClick={() => setFormData({...formData, socio: 'Sí'})}>
-                          <input type="radio" checked={formData.socio === 'Sí'} readOnly />
-                          <div class="radio-card-text">
-                            <strong>Sí, sóc persona sòcia d'ACCU</strong>
-                            <span>Quota de soci en regla</span>
-                          </div>
-                        </div>
-                        <div class={`radio-card ${formData.socio === 'No' ? 'selected' : ''}`} onClick={() => setFormData({...formData, socio: 'No'})}>
-                          <input type="radio" checked={formData.socio === 'No'} readOnly />
-                          <div class="radio-card-text">
-                            <strong>No sóc soci/a (Acompanyant / No soci)</strong>
-                            <span>Familiar o persona interessada</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-grid">
-                      <div class="field">
-                        <label>Telèfon Mòbil *</label>
-                        <input type="tel" required placeholder="Ex: 612 345 678" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} />
-                      </div>
-                      <div class="field">
-                        <label>Correu Electrònic *</label>
-                        <input type="email" required placeholder="Ex: maria.serra@gmail.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                      </div>
-                    </div>
-
-                    <div class="field">
-                      <label>Comentaris i Observacions (opcional)</label>
-                      <textarea rows="3" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={formData.observacions} onChange={e => setFormData({...formData, observacions: e.target.value})}></textarea>
-                    </div>
+                    <FormulariaCamps data={titular} onChange={handleTitularChange} />
                   </div>
 
-                  {/* Pas 2: Persones Acompanyants */}
                   <div class="section-card">
                     <div class="section-header">
                       <div class="section-title-wrap">
                         <div class="step-num">2</div>
                         <div>
                           <h2 class="section-title">Persones Acompanyants</h2>
-                          <div class="section-subtitle">Vens acompanyat/da? Pots inscriure la teva parella, fills o familiars.</div>
+                          <div class="section-subtitle">Vens acompanyat/da? Inscriu la teva parella, fills o familiars.</div>
                         </div>
                       </div>
                     </div>
 
-                    {formData.acompanyants.map((acomp, idx) => (
+                    {acompanyants.map((acomp, idx) => (
                       <div key={idx} class="companion-block">
-                        <button type="button" class="remove-btn" onClick={() => eliminarAcompanyant(idx)}>×</button>
-                        <strong style={{display:'block', marginBottom:'10px', color:'var(--primary)', fontSize:'13px'}}>Acompanyant #{idx + 1}</strong>
-                        <div class="form-grid">
-                          <div class="field">
-                            <label>Nom *</label>
-                            <input type="text" required value={acomp.nom} onChange={e => actualitzarAcompanyant(idx, 'nom', e.target.value)} />
-                          </div>
-                          <div class="field">
-                            <label>Cognoms *</label>
-                            <input type="text" required value={acomp.cognoms} onChange={e => actualitzarAcompanyant(idx, 'cognoms', e.target.value)} />
-                          </div>
-                        </div>
-                        <div class="form-grid">
-                          <div class="field">
-                            <label>Data de naixement *</label>
-                            <input type="date" required value={acomp.dataNaixement} onChange={e => actualitzarAcompanyant(idx, 'dataNaixement', e.target.value)} />
-                            {acomp.edatCalculada !== '' && <small style={{color:'var(--primary)', fontWeight:'600'}}>Edat: {acomp.edatCalculada} anys</small>}
-                          </div>
-                          <div class="field">
-                            <label>DNI / NIE (opcional)</label>
-                            <input type="text" value={acomp.nif} onChange={e => actualitzarAcompanyant(idx, 'nif', e.target.value)} />
-                          </div>
-                        </div>
+                        <button type="button" class="remove-btn" onClick={() => eliminarAcompanyant(idx)}>Eliminar</button>
+                        <strong style={{display:'block', marginBottom:'15px', color:'var(--primary)', fontSize:'14px'}}>Acompanyant #{idx + 1}</strong>
+                        <FormulariaCamps data={acomp} onChange={(f, v) => handleAcompanyantChange(idx, f, v)} isAcompanyant={true} />
                       </div>
                     ))}
 
@@ -389,7 +435,7 @@
                   </div>
 
                   <button type="submit" class="btn-submit" disabled={loading}>
-                    {loading ? 'Processant reserva...' : 'Confirmar i enviar inscripció'}
+                    {loading ? 'Processant reserva...' : `Confirmar i enviar inscripció (Total: ${totalPreu} €)`}
                   </button>
                 </form>
               )}
