@@ -1,0 +1,1 @@
+# trobada-accu-2026-Gemini
