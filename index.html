@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscripció II Trobada ACCU Catalunya 2026</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 20px; background: #f8fafc; color: #1e293b; }
+    .container { max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    h2, h3 { color: #0f172a; margin-top: 0; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+      width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    button { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #94a3b8; }
+    .nav { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    .nav button { background: transparent; color: #64748b; border: none; font-size: 16px; padding: 8px 16px; }
+    .nav button.active { color: #2563eb; font-weight: bold; border-bottom: 2px solid #2563eb; border-radius: 0; }
+    .alert-info { background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin-top: 20px; border-radius: 4px; color: #1e40af; font-size: 14px; line-height: 1.5; }
+    .table-container { overflow-x: auto; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+    th { background: #f1f5f9; }
+    .row-baixa { background-color: #fef2f2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzv-Yfwoq9FQv11WBChcK0o61wHfbHbmr9VKgZ_rhzW11Py-TzHj20p8Oyk7tplVrsP/exec';
+
+    function App() {
+      const [vista, setVista] = React.useState('formulari');
+      const [password, setPassword] = React.useState('');
+      const [autenticat, setAutenticat] = React.useState(false);
+      const [inscripcions, setInscripcions] = React.useState([]);
+      const [loading, setLoading] = React.useState(false);
+      const [completat, setCompletat] = React.useState(false);
+
+      const [formData, setFormData] = React.useState({
+        nomCognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', edatCalculada: '',
+        tipusAllotjament: 'doble', companySollicitat: '', accessibilitat: 'No', celiac: 'No',
+        senseLactosa: 'No', baixaResidus: 'No', vegetaria: 'No', ostomia: 'No', neveraMedicacio: 'No',
+        allergies: '', observacionsDietetiques: '', tallerDissabte: '', tallerDiumenge: '',
+        contacteEmergencia: '', telefonEmergencia: '', observacionsGenerals: ''
+      });
+
+      const calcularEdat = (dataNaix) => {
+        if (!dataNaix) return '';
+        const avui = new Date();
+        const naixement = new Date(dataNaix);
+        let edat = avui.getFullYear() - naixement.getFullYear();
+        const mes = avui.getMonth() - naixement.getMonth();
+        if (mes < 0 || (mes === 0 && avui.getDate() < naixement.getDate())) edat--;
+        return edat;
+      };
+
+      const handleDataNaixement = (e) => {
+        const d = e.target.value;
+        setFormData({ ...formData, dataNaixement: d, edatCalculada: calcularEdat(d) });
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'inscriure', data: { ...formData, tipusPersona: 'titular' } })
+          });
+          setCompletat(true);
+        } catch (err) {
+          alert("S'ha produït un error en enviar la inscripció.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const carregarDadesGestor = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'obtenirInscripcions', password })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setInscripcions(data.data);
+            setAutenticat(true);
+          } else {
+            alert('Contrasenya incorrecta');
+          }
+        } catch (err) {
+          alert('Error en connectar amb el gestor');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div class="container">
+          <nav class="nav">
+            <button class={vista === 'formulari' ? 'active' : ''} onClick={() => setVista('formulari')}>Formulari d'Inscripció</button>
+            <button class={vista === 'gestio' ? 'active' : ''} onClick={() => setVista('gestio')}>Gestió Privada</button>
+          </nav>
+
+          {vista === 'formulari' && (
+            <div>
+              <h2>Formulari d'Inscripció — II Trobada ACCU 2026</h2>
+              {completat ? (
+                <div class="alert-info">
+                  <strong>Inscripció registrada correctament.</strong>
+                  <br/><br/>
+                  Per confirmar la reserva i l'aforament de cada persona (titular i acompanyants), caldrà abonar una quantitat simbòlica de <strong>20 €</strong> per persona. En el correu que rebreu després de fer la reserva se us indicarà la forma de pagament per reconfirmar les vostres places.
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <div class="grid">
+                    <div class="form-group">
+                      <label>Nom i Cognoms *</label>
+                      <input type="text" required value={formData.nomCognoms} onChange={e => setFormData({...formData, nomCognoms: e.target.value})} />
+                    </div>
+                    <div class="form-group">
+                      <label>Data de naixement *</label>
+                      <input type="date" required value={formData.dataNaixement} onChange={handleDataNaixement} />
+                      {formData.edatCalculada !== '' && <small style={{color:'#64748b'}}>Edat calculada: {formData.edatCalculada} anys</small>}
+                    </div>
+                  </div>
+
+                  <div class="grid">
+                    <div class="form-group">
+                      <label>NIF / NIE *</label>
+                      <input type="text" required value={formData.nif} onChange={e => setFormData({...formData, nif: e.target.value})} />
+                    </div>
+                    <div class="form-group">
+                      <label>Email *</label>
+                      <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                    </div>
+                  </div>
+
+                  <div class="grid">
+                    <div class="form-group">
+                      <label>Telèfon *</label>
+                      <input type="tel" required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} />
+                    </div>
+                    <div class="form-group">
+                      <label>Tipus d'Allotjament</label>
+                      <select value={formData.tipusAllotjament} onChange={e => setFormData({...formData, tipusAllotjament: e.target.value})}>
+                        <option value="doble">Habitació Doble</option>
+                        <option value="individual">Habitació Individual</option>
+                        <option value="sense_allotjament">Sense Allotjament</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={loading}>{loading ? 'Enviant...' : 'Completar Reserva'}</button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {vista === 'gestio' && (
+            <div>
+              <h2>Gestió Privada d'Inscripcions</h2>
+              {!autenticat ? (
+                <div style={{display:'flex', gap:'10px'}}>
+                  <input type="password" placeholder="Contrasenya" value={password} onChange={e => setPassword(e.target.value)} />
+                  <button onClick={carregarDadesGestor} disabled={loading}>{loading ? 'Entrant...' : 'Entrar'}</button>
+                </div>
+              ) : (
+                <div class="table-container">
+                  <p>Inscripcions totals: {inscripcions.length > 0 ? inscripcions.length - 1 : 0}</p>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Data Naixement</th>
+                        <th>Edat</th>
+                        <th>Estat</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inscripcions.slice(1).map((row, idx) => (
+                        <tr key={idx} class={row[8] === 'baixa' ? 'row-baixa' : ''}>
+                          <td>{row[2]}</td>
+                          <td>{row[4]}</td>
+                          <td>{row[40]}</td>
+                          <td>{row[31]}</td>
+                          <td>{row[8]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
