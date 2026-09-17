@@ -1,143 +1,472 @@
-// =================================================================
-// APPS SCRIPT DEFINITIU — ACCU CATALUNYA (Correu oficial)
-// =================================================================
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>II Trobada de Persones Sòcies i Famílies — ACCU Catalunya</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #f5f3ff;
+      --primary-border: #ddd6fe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --radius: 16px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 15px; background: var(--bg-page); color: var(--text-main); }
+    .app-container { max-width: 720px; margin: 0 auto; }
+    
+    .hero-card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .hero-img { width: 100%; height: 280px; object-fit: cover; display: block; }
+    .hero-content { padding: 25px; }
+    .badge-group { display: flex; gap: 8px; margin-bottom: 12px; }
+    .badge { background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .hero-title { font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0; }
+    .hero-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 20px 0; line-height: 1.5; }
+    
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .info-card { background: var(--primary-light); border: 1px solid var(--primary-border); padding: 15px; border-radius: 12px; display: flex; gap: 12px; align-items: center; }
+    .info-icon { font-size: 20px; background: #ffffff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .info-text label { display: block; font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--primary); }
+    .info-text strong { font-size: 14px; color: #0f172a; display: block; }
+    .info-text span { font-size: 12px; color: var(--text-muted); }
+    
+    .notice-card { background: var(--primary-light); border: 1px solid var(--primary-border); padding: 15px; border-radius: 12px; display: flex; gap: 12px; }
+    .notice-card span { font-size: 13px; color: #4c1d95; line-height: 1.4; }
 
-const SPREADSHEET_ID = '130Xj5yWJLBpkUWPSWYlXGHhNqmyJFd2xW-FCCL3abmI';
-const SHEET_NAME = 'Hoja 1';
+    .section-card { background: var(--card-bg); border-radius: var(--radius); padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title-wrap { display: flex; align-items: center; gap: 12px; }
+    .step-num { background: var(--primary-light); color: var(--primary); font-weight: 800; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .section-title { font-size: 18px; font-weight: 700; margin: 0; }
+    .section-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .pill-tag { background: #f1f5f9; color: var(--primary); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
 
-function doPost(e) {
-  try {
-    const contents = JSON.parse(e.postData.contents);
-    const action = contents.action;
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    .field { margin-bottom: 15px; }
+    .field label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #334155; }
+    .field input, .field select, .field textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fff; }
+    
+    .date-select-group { display: grid; grid-template-columns: 1fr 1.5fr 1.2fr; gap: 8px; }
 
-    if (action === 'inscriure') {
-      return guardarInscripcio(contents.data);
-    } else if (action === 'obtenirInscripcions') {
-      return obtenirInscripcions();
-    } else if (action === 'canviarEstat') {
-      return canviarEstatInscripcio(contents.id, contents.nouEstat);
+    .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .radio-card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; background: #ffffff; }
+    .radio-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 1px var(--primary); }
+    .radio-card input[type="radio"] { margin: 0; width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
+    .radio-card-text { display: flex; flex-direction: column; gap: 2px; }
+    .radio-card-text strong { font-size: 13px; color: #0f172a; line-height: 1.2; }
+    .radio-card-text span { font-size: 11px; color: var(--text-muted); }
+
+    .companion-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
+    .remove-btn { position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+    .btn-add { background: var(--primary-light); color: var(--primary); border: 1px dashed var(--primary); padding: 12px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-submit { background: var(--primary); color: #fff; border: none; padding: 16px; border-radius: 10px; font-weight: 700; font-size: 16px; width: 100%; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); margin-top: 10px; }
+    .btn-submit:disabled { background: #94a3b8; box-shadow: none; }
+    
+    .top-bar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+    .top-bar button { background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 13px; }
+    .top-bar button.active { color: var(--primary); text-decoration: underline; }
+
+    .row-baixa { background-color: #fce8e6 !important; color: #c5221f; }
+
+    @media (max-width: 600px) {
+      .info-grid, .form-grid, .radio-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyLMyFJJUAY86s29wj1Pb6D11UphmV8uyeOa1tiWTI3eD74wVkk9Zx_VIc5h_z_kSSk/exec';
+
+    const MESOS = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    const ANYS = Array.from({length: 100}, (_, i) => 2026 - i);
+
+    function SelectorData({ value, onChange }) {
+      const parts = value ? value.split('/') : ['', '', ''];
+      const dia = parts[0] || '';
+      const mes = parts[1] || '';
+      const any = parts[2] || '';
+
+      const update = (newDia, newMes, newAny) => {
+        const d = newDia !== undefined ? newDia : dia;
+        const m = newMes !== undefined ? newMes : mes;
+        const a = newAny !== undefined ? newAny : any;
+
+        if (d && m && a) {
+          const dPad = String(d).padStart(2, '0');
+          const mPad = String(m).padStart(2, '0');
+          onChange(`${dPad}/${mPad}/${a}`);
+        } else {
+          onChange(a || m || d ? `${d}/${m}/${a}` : '');
+        }
+      };
+
+      return (
+        <div className="date-select-group">
+          <select value={dia} onChange={e => update(e.target.value, mes, any)}>
+            <option value="">Dia</option>
+            {Array.from({length: 31}, (_, i) => i + 1).map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+
+          <select value={mes} onChange={e => update(dia, e.target.value, any)}>
+            <option value="">Mes</option>
+            {MESOS.map((m, idx) => (
+              <option key={idx + 1} value={idx + 1}>{m}</option>
+            ))}
+          </select>
+
+          <select value={any} onChange={e => update(dia, mes, e.target.value)}>
+            <option value="">Any</option>
+            {ANYS.map(a => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </div>
+      );
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'Accio no valida' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    function FormulariaCamps({ data, onChange, isAcompanyant = false }) {
+      return (
+        <div>
+          <div className="form-grid">
+            <div className="field">
+              <label>Nom *</label>
+              <input type="text" required placeholder="Ex: Maria" value={data.nom} onChange={e => onChange('nom', e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Cognoms *</label>
+              <input type="text" required placeholder="Ex: Serra i Puig" value={data.cognoms} onChange={e => onChange('cognoms', e.target.value)} />
+            </div>
+          </div>
 
-function doGet(e) {
-  return ContentService.createTextOutput("API activa i funcionant.")
-    .setMimeType(ContentService.MimeType.TEXT);
-}
+          <div className="form-grid">
+            <div className="field">
+              <label>DNI / NIE *</label>
+              <input type="text" required placeholder="12345678X" value={data.nif} onChange={e => onChange('nif', e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Data de naixement *</label>
+              <SelectorData value={data.dataNaixement} onChange={val => onChange('dataNaixement', val)} />
+            </div>
+          </div>
 
-function obtenirFullActiu(ss) {
-  let sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) {
-    sheet = ss.getSheets()[0];
-  }
-  return sheet;
-}
+          <div className="field">
+            <label>És soci/a d'ACCU Catalunya? *</label>
+            <div className="radio-group">
+              <div className={`radio-card ${data.socio === 'Sí' ? 'selected' : ''}`} onClick={() => onChange('socio', 'Sí')}>
+                <input type="radio" checked={data.socio === 'Sí'} readOnly />
+                <div className="radio-card-text">
+                  <strong>Sí, sóc persona sòcia d'ACCU</strong>
+                  <span>Quota de soci en regla</span>
+                </div>
+              </div>
+              <div className={`radio-card ${data.socio === 'No' ? 'selected' : ''}`} onClick={() => onChange('socio', 'No')}>
+                <input type="radio" checked={data.socio === 'No'} readOnly />
+                <div className="radio-card-text">
+                  <strong>Acompanyant</strong>
+                  <span>Familiar o persona interessada</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-function generatSeguentID(sheet) {
-  const lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return 'accu-001';
-  
-  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
-  let maxNum = 0;
-  
-  ids.forEach(row => {
-    const str = String(row[0]);
-    if (str.startsWith('accu-')) {
-      const num = parseInt(str.replace('accu-', ''), 10);
-      if (!isNaN(num) && num > maxNum) {
-        maxNum = num;
-      }
+          {!isAcompanyant && (
+            <div className="form-grid">
+              <div className="field">
+                <label>Telèfon Mòbil *</label>
+                <input type="tel" required placeholder="Ex: 612 345 678" value={data.telefono} onChange={e => onChange('telefono', e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Correu Electrònic *</label>
+                <input type="email" required placeholder="Ex: maria.serra@gmail.com" value={data.email} onChange={e => onChange('email', e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          <div className="field">
+            <label>Comentaris i observacions</label>
+            <textarea rows="2" placeholder="Qualsevol dada, necessitat especial o comentari per a l'organització d'ACCU..." value={data.observacions} onChange={e => onChange('observacions', e.target.value)}></textarea>
+          </div>
+        </div>
+      );
     }
-  });
-  
-  return 'accu-' + String(maxNum + 1).padStart(3, '0');
-}
 
-function guardarInscripcio(data) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = obtenirFullActiu(ss);
-  
-  const nouID = generatSeguentID(sheet);
-  
-  const avui = new Date();
-  const dataRegistre = `${String(avui.getDate()).padStart(2, '0')}/${String(avui.getMonth() + 1).padStart(2, '0')}/${avui.getFullYear()}`;
+    function App() {
+      const [vista, setVista] = React.useState('formulari');
+      const [inscripcions, setInscripcions] = React.useState([]);
+      const [loading, setLoading] = React.useState(false);
+      const [completat, setCompletat] = React.useState(false);
 
-  // Desa a Google Sheets
-  sheet.appendRow([
-    nouID,
-    dataRegistre,
-    data.nomCognoms || '',
-    data.nif || '',
-    data.email || '',
-    data.telefono || '',
-    data.socio || '',
-    data.dataNaixement || '',
-    'pendent'
-  ]);
+      const [titular, setTitular] = React.useState({
+        nom: '', cognoms: '', nif: '', email: '', telefono: '', dataNaixement: '', socio: 'Sí', observacions: ''
+      });
 
-  // Enviament del correu de confirmació amb el redactat oficial d'ACCU Catalunya
-  if (data.email) {
-    const importTotal = data.totalPreu || 20;
-    const assumpte = `Confirmació de preinscripció — II Trobada ACCU Catalunya (${nouID})`;
-    const cosText = `Benvolgut/da ${data.nomCognoms},
+      const [acompanyants, setAcompanyants] = React.useState([]);
 
-Ens fa molta il·lusió confirmar que hem rebut correctament la vostra preinscripció per a la II Trobada de Persones Sòcies i Famílies d'ACCU Catalunya.
+      const handleTitularChange = (field, value) => {
+        setTitular(prev => ({ ...prev, [field]: value }));
+      };
 
-El vostre codi de reserva assignat és: ${nouID}
+      const afegirAcompanyant = () => {
+        setAcompanyants(prev => [
+          ...prev,
+          { nom: '', cognoms: '', nif: '', dataNaixement: '', socio: 'No', observacions: '' }
+        ]);
+      };
 
-PER CONFIRMAR I FER EFECTIVA LA PLAÇA:
-Cal realitzar el pagament de la reserva per un import de ${importTotal} € a través d'una de les següents opcions:
+      const handleAcompanyantChange = (idx, field, value) => {
+        setAcompanyants(prev => {
+          const nous = [...prev];
+          nous[idx] = { ...nous[idx], [field]: value };
+          return nous;
+        });
+      };
 
-* Bizum: codi 10313
-* Transferència bancària: La Caixa - ES40 2100 0854 1102 0026 4237
+      const eliminarAcompanyant = (idx) => {
+        setAcompanyants(prev => prev.filter((_, i) => i !== idx));
+      };
 
-Molt important: 
-Indiqueu obligatòriament en el concepte del pagament el vostre codi de reserva i nom complet: "${nouID} - ${data.nomCognoms}".
-Recordeu que les places són limitades i la confirmació definitiva de la inscripció es farà per rigorós ordre de recepció del pagament.
+      const totalPersones = 1 + acompanyants.length;
+      const totalPreu = totalPersones * 20;
 
-Un comproven l'ingrés, actualitzarem l'estat de la vostra reserva a confirmada i us enviarem un avís.
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-Si teniu qualsevol dubte, podeu respondre directament a aquest correu o contactar amb nosaltres a info@accucat.org.
+        const nomCompletTitular = `${titular.nom} ${titular.cognoms}`.trim();
 
-Atentament,
-L'Equip d'ACCU Catalunya`;
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'inscriure',
+              data: {
+                nomCognoms: nomCompletTitular,
+                nif: titular.nif,
+                email: titular.email,
+                telefono: titular.telefono,
+                socio: titular.socio,
+                dataNaixement: titular.dataNaixement,
+                totalPreu: totalPreu
+              }
+            })
+          });
 
-    MailApp.sendEmail(data.email, assumpte, cosText, {
-      replyTo: "comunicacio@accucat.org"
-    });
-  }
+          for (const acomp of acompanyants) {
+            const nomCompletAcomp = `${acomp.nom} ${acomp.cognoms}`.trim();
+            await fetch(API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({
+                action: 'inscriure',
+                data: {
+                  nomCognoms: nomCompletAcomp,
+                  nif: acomp.nif,
+                  email: titular.email,
+                  telefono: titular.telefono,
+                  socio: acomp.socio,
+                  dataNaixement: acomp.dataNaixement
+                }
+              })
+            });
+          }
 
-  return ContentService.createTextOutput(JSON.stringify({ success: true, message: 'Inscripció desada i correu enviat', id: nouID }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+          setCompletat(true);
+        } catch (err) {
+          alert("S'ha produït un error en enviar la reserva.");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-function obtenirInscripcions() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = obtenirFullActiu(ss);
-  const values = sheet.getDataRange().getValues();
-  
-  return ContentService.createTextOutput(JSON.stringify({ success: true, data: values }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+      const carregarDadesGestor = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'obtenirInscripcions' })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setInscripcions(data.data);
+          } else {
+            alert('Error del servidor: ' + (data.error || 'Desconegut'));
+          }
+        } catch (err) {
+          alert('Error de connexió amb l\'API');
+        } finally {
+          setLoading(false);
+        }
+      };
 
-function canviarEstatInscripcio(id, nouEstat) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = obtenirFullActiu(ss);
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === id) { 
-      sheet.getRange(i + 1, 9).setValue(nouEstat); 
-      break;
+      React.useEffect(() => {
+        if (vista === 'gestio') {
+          carregarDadesGestor();
+        }
+      }, [vista]);
+
+      return (
+        <div className="app-container">
+          <div className="top-bar">
+            <button className={vista === 'formulari' ? 'active' : ''} onClick={() => setVista('formulari')}>Formulari Públic</button>
+            <button className={vista === 'gestio' ? 'active' : ''} onClick={() => setVista('gestio')}>Gestió Privada</button>
+          </div>
+
+          {vista === 'formulari' && (
+            <div>
+              <div className="hero-card">
+                <img className="hero-img" src="hotel_cmc_girona.jpg" alt="Hotel Best Western Premier CMC Girona" onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';}} />
+                <div className="hero-content">
+                  <div className="badge-group">
+                    <span className="badge" style={{background:'#f3e8ff', color:'#7c3aed'}}>ACCU Catalunya — Trobada 2026</span>
+                    <span className="badge">Girona</span>
+                  </div>
+                  <h1 className="hero-title">II Trobada de Persones Sòcies i Famílies</h1>
+                  <p className="hero-desc">Jornades de convivència, tallers i suport mutu per a persones diagnosticades de Crohn, Colitis Ulcerosa i els seus acompanyants.</p>
+
+                  <div className="info-grid">
+                    <div className="info-card">
+                      <div className="info-icon">📅</div>
+                      <div className="info-text">
+                        <label>Data de la Trobada</label>
+                        <strong>14 i 15 de Novembre</strong>
+                        <span>Dissabte i Diumenge</span>
+                      </div>
+                    </div>
+                    <div className="info-card">
+                      <div className="info-icon">📍</div>
+                      <div className="info-text">
+                        <label>Lloc i Allotjament</label>
+                        <strong>Hotel Best Western Premier CMC</strong>
+                        <span>Girona</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="notice-card">
+                    <div style={{fontSize:'20px'}}>💳</div>
+                    <span><strong>Reserva de plaça simbòlica de 20 € per persona.</strong><br/>Per confirmar la reserva i l'aforament de cada persona (titular i acompanyants), caldrà abonar una quantitat simbòlica de 20 € per persona. En el correu que rebreu després de fer la reserva <strong>us indicarem</strong> la forma de pagament per reconfirmar les vostres places.</span>
+                  </div>
+                </div>
+              </div>
+
+              {completat ? (
+                <div className="section-card" style={{textAlign:'center', padding:'40px 20px'}}>
+                  <div style={{fontSize:'48px', marginBottom:'15px'}}>🎉</div>
+                  <h2 style={{color:'var(--primary)'}}>Inscripció Registrada!</h2>
+                  <p style={{color:'var(--text-muted)', lineHeight:'1.6'}}>Gràcies per inscriure't a la II Trobada d'ACCU Catalunya. Rebràs un correu electrònic amb les instruccions per fer el pagament de la reserva.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <div className="section-card">
+                    <div className="section-header">
+                      <div className="section-title-wrap">
+                        <div className="step-num">1</div>
+                        <div>
+                          <h2 className="section-title">Dades de la Persona Titular</h2>
+                          <div className="section-subtitle">Persona de contacte principal que sol·licita la inscripció.</div>
+                        </div>
+                      </div>
+                      <span className="pill-tag">Titular de la reserva</span>
+                    </div>
+
+                    <FormulariaCamps data={titular} onChange={handleTitularChange} />
+                  </div>
+
+                  <div className="section-card">
+                    <div className="section-header">
+                      <div className="section-title-wrap">
+                        <div className="step-num">2</div>
+                        <div>
+                          <h2 className="section-title">Persones Acompanyants</h2>
+                          <div className="section-subtitle">Vens acompanyat/da? Inscriu la teva parella, fills o familiars.</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {acompanyants.map((acomp, idx) => (
+                      <div key={idx} className="companion-block">
+                        <button type="button" className="remove-btn" onClick={() => eliminarAcompanyant(idx)}>Eliminar</button>
+                        <strong style={{display:'block', marginBottom:'15px', color:'var(--primary)', fontSize:'14px'}}>Acompanyant #{idx + 1}</strong>
+                        <FormulariaCamps data={acomp} onChange={(f, v) => handleAcompanyantChange(idx, f, v)} isAcompanyant={true} />
+                      </div>
+                    ))}
+
+                    <button type="button" className="btn-add" onClick={afegirAcompanyant}>
+                      <span>+</span> Afegir acompanyant
+                    </button>
+                  </div>
+
+                  <button type="submit" className="btn-submit" disabled={loading}>
+                    {loading ? 'Processant reserva...' : `Confirmar i enviar inscripció (Total: ${totalPreu} €)`}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {vista === 'gestio' && (
+            <div className="section-card">
+              <h2>Panell Privat de Gestió</h2>
+              {loading ? (
+                <p>Carregant dades...</p>
+              ) : (
+                <div style={{overflowX:'auto'}}>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'15px'}}>
+                    <p style={{margin:0}}>Inscripcions totals: {inscripcions.length > 0 ? inscripcions.length - 1 : 0}</p>
+                    <button onClick={carregarDadesGestor} style={{background:'var(--primary)', color:'#fff', border:'none', padding:'8px 15px', borderRadius:'6px', cursor:'pointer', fontSize:'12px'}}>Actualitzar llista</button>
+                  </div>
+                  <table style={{width:'100%', borderCollapse:'collapse', fontSize:'13px'}}>
+                    <thead>
+                      <tr style={{background:'#f1f5f9'}}>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>ID</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Data Registre</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Nom i Cognoms</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>NIF/NIE</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Email</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Telèfon</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Soci/a</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Data Naixement</th>
+                        <th style={{padding:'8px', border:'1px solid #e2e8f0'}}>Estat pagament</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inscripcions.slice(1).map((row, idx) => (
+                        <tr key={idx} className={row[8] === 'baixa' ? 'row-baixa' : ''}>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0', fontWeight:'bold'}}>{row[0]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[1]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[2]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[3]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[4]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[5]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[6]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[7]}</td>
+                          <td style={{padding:'8px', border:'1px solid #e2e8f0'}}>{row[8]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
     }
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({ success: true, message: 'Estat actualitzat' }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
