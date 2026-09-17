@@ -1,182 +1,143 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preinscripció — II Trobada ACCU Catalunya</title>
+// =================================================================
+// APPS SCRIPT DEFINITIU — ACCU CATALUNYA (Correu oficial)
+// =================================================================
+
+const SPREADSHEET_ID = '130Xj5yWJLBpkUWPSWYlXGHhNqmyJFd2xW-FCCL3abmI';
+const SHEET_NAME = 'Hoja 1';
+
+function doPost(e) {
+  try {
+    const contents = JSON.parse(e.postData.contents);
+    const action = contents.action;
+
+    if (action === 'inscriure') {
+      return guardarInscripcio(contents.data);
+    } else if (action === 'obtenirInscripcions') {
+      return obtenirInscripcions();
+    } else if (action === 'canviarEstat') {
+      return canviarEstatInscripcio(contents.id, contents.nouEstat);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'Accio no valida' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput("API activa i funcionant.")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function obtenirFullActiu(ss) {
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.getSheets()[0];
+  }
+  return sheet;
+}
+
+function generatSeguentID(sheet) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 'accu-001';
   
-  <!-- Estils i Icones -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.google.com/recaptcha/api.js?render=6Ldh0ogsAAAAAA51XBERJe51dEQoStsWCrVTTiux"></script>
-</head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let maxNum = 0;
+  
+  ids.forEach(row => {
+    const str = String(row[0]);
+    if (str.startsWith('accu-')) {
+      const num = parseInt(str.replace('accu-', ''), 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+  });
+  
+  return 'accu-' + String(maxNum + 1).padStart(3, '0');
+}
 
-  <!-- Capçalera Oficial ACCU Catalunya -->
-  <header class="bg-purple-900 text-white shadow-lg">
-    <div class="max-w-4xl mx-auto px-4 py-8 text-center">
-      <span class="inline-block bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-        Inscripció Oficial
-      </span>
-      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-        II Trobada d'ACCU Catalunya
-      </h1>
-      <p class="mt-2 text-purple-200 text-lg">
-        Best Western Premier CMC Girona &bull; 14 i 15 de novembre
-      </p>
-    </div>
-  </header>
+function guardarInscripcio(data) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = obtenirFullActiu(ss);
+  
+  const nouID = generatSeguentID(sheet);
+  
+  const avui = new Date();
+  const dataRegistre = `${String(avui.getDate()).padStart(2, '0')}/${String(avui.getMonth() + 1).padStart(2, '0')}/${avui.getFullYear()}`;
 
-  <main class="max-w-2xl mx-auto px-4 mt-8">
-    
-    <!-- Missatges d'estat -->
-    <div id="alertSuccess" class="hidden mb-6 p-6 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl shadow-sm text-center">
-      <h3 class="text-xl font-bold mb-2">¡Preinscripció Rebut Amb Èxit!</h3>
-      <p id="successMessageText" class="text-sm mb-4"></p>
-      <div class="bg-white p-4 rounded-xl border border-emerald-100 text-left text-xs space-y-2 text-slate-700">
-        <p class="font-bold text-slate-900 text-sm">Passos per confirmar la plaça:</p>
-        <p>&bull; T'hem enviat un correu amb els detalls de la reserva.</p>
-        <p>&bull; Fes l'ingrés de <strong>20 €</strong> per Bizum al codi <strong>10313</strong> o per transferència a La Caixa.</p>
-        <p>&bull; Concepte obligatori: <strong id="conceptText"></strong></p>
-      </div>
-    </div>
+  // Desa a Google Sheets
+  sheet.appendRow([
+    nouID,
+    dataRegistre,
+    data.nomCognoms || '',
+    data.nif || '',
+    data.email || '',
+    data.telefono || '',
+    data.socio || '',
+    data.dataNaixement || '',
+    'pendent'
+  ]);
 
-    <div id="alertError" class="hidden mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
-    </div>
+  // Enviament del correu de confirmació amb el redactat oficial d'ACCU Catalunya
+  if (data.email) {
+    const importTotal = data.totalPreu || 20;
+    const assumpte = `Confirmació de preinscripció — II Trobada ACCU Catalunya (${nouID})`;
+    const cosText = `Benvolgut/da ${data.nomCognoms},
 
-    <!-- Targeta del Formulari -->
-    <div id="formContainer" class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
-      <form id="inscriptionForm" class="p-6 sm:p-8 space-y-6">
-        
-        <!-- Dades Personals -->
-        <div>
-          <h2 class="text-lg font-bold text-purple-900 mb-4 border-b border-purple-100 pb-2">
-            Dades de la persona titular
-          </h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="nomCognoms">Nom i Cognoms *</label>
-              <input type="text" id="nomCognoms" required placeholder="Ex. Joan Garcia" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="nif">NIF / DNI / NIE *</label>
-              <input type="text" id="nif" required placeholder="Ex. 12345678X" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="email">Correu electrònic *</label>
-              <input type="email" id="email" required placeholder="joan@exemple.cat" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="telefono">Telèfon *</label>
-              <input type="tel" id="telefono" required placeholder="600123456" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none">
-            </div>
-          </div>
-        </div>
+Ens fa molta il·lusió confirmar que hem rebut correctament la vostra preinscripció per a la II Trobada de Persones Sòcies i Famílies d'ACCU Catalunya.
 
-        <!-- Condició de Soci i Data Naixement -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="socio">Sou persona sòcia d'ACCU? *</label>
-            <select id="socio" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none bg-white">
-              <option value="si">Sí, sóc persona sòcia</option>
-              <option value="no">No sóc persona sòcia</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1" for="dataNaixement">Data de naixement *</label>
-            <input type="date" id="dataNaixement" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none bg-white">
-          </div>
-        </div>
+El vostre codi de reserva assignat és: ${nouID}
 
-        <!-- Botó d'Enviar -->
-        <div class="pt-4">
-          <button type="submit" id="submitBtn" class="w-full bg-purple-900 hover:bg-purple-800 disabled:bg-purple-400 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition text-base">
-            Enviar Preinscripció (20 €)
-          </button>
-        </div>
+PER CONFIRMAR I FER EFECTIVA LA PLAÇA:
+Cal realitzar el pagament de la reserva per un import de ${importTotal} € a través d'una de les següents opcions:
 
-        <p class="text-center text-xs text-slate-400 mt-4">
-          Aquest lloc està protegit per reCAPTCHA v3 i s'apliquen la 
-          <a href="https://policies.google.com/privacy" class="underline" target="_blank">Política de Privadesa</a> i els 
-          <a href="https://policies.google.com/terms" class="underline" target="_blank">Termes del Servei</a> de Google.
-        </p>
-      </form>
-    </div>
-  </main>
+* Bizum: codi 10313
+* Transferència bancària: La Caixa - ES40 2100 0854 1102 0026 4237
 
-  <script>
-    // La URL del teu backend a Apps Script
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec"; 
-    const RECAPTCHA_SITE_KEY = "6Ldh0ogsAAAAAA51XBERJe51dEQoStsWCrVTTiux";
+Molt important: 
+Indiqueu obligatòriament en el concepte del pagament el vostre codi de reserva i nom complet: "${nouID} - ${data.nomCognoms}".
+Recordeu que les places són limitades i la confirmació definitiva de la inscripció es farà per rigorós ordre de recepció del pagament.
 
-    const form = document.getElementById('inscriptionForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const alertSuccess = document.getElementById('alertSuccess');
-    const alertError = document.getElementById('alertError');
+Un comproven l'ingrés, actualitzarem l'estat de la vostra reserva a confirmada i us enviarem un avís.
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+Si teniu qualsevol dubte, podeu respondre directament a aquest correu o contactar amb nosaltres a info@accucat.org.
 
-      alertSuccess.classList.add('hidden');
-      alertError.classList.add('hidden');
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Processant inscripció...";
+Atentament,
+L'Equip d'ACCU Catalunya`;
 
-      grecaptcha.ready(function() {
-        grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'inscriure' }).then(function(token) {
-          
-          const payload = {
-            action: 'inscriure',
-            recaptchaToken: token,
-            data: {
-              nomCognoms: document.getElementById('nomCognoms').value,
-              nif: document.getElementById('nif').value,
-              email: document.getElementById('email').value,
-              telefono: document.getElementById('telefono').value,
-              socio: document.getElementById('socio').value,
-              dataNaixement: document.getElementById('dataNaixement').value,
-              totalPreu: 20
-            }
-          };
-
-          fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          })
-          .then(response => response.json())
-          .then(result => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Enviar Preinscripció (20 €)";
-
-            if (result.success) {
-              document.getElementById('successMessageText').innerText = "Codi de reserva assignat: " + result.id;
-              document.getElementById('conceptText').innerText = '"' + result.id + ' - ' + document.getElementById('nomCognoms').value + '"';
-              
-              document.getElementById('formContainer').classList.add('hidden');
-              alertSuccess.classList.remove('hidden');
-            } else {
-              alertError.innerText = "Error: " + (result.error || "No s'ha pogut processar la inscripció.");
-              alertError.classList.remove('hidden');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Enviar Preinscripció (20 €)";
-            alertError.innerText = "S'ha produït un error de connexió amb el servidor.";
-            alertError.classList.remove('hidden');
-          });
-
-        }).catch(function(err) {
-          console.error(err);
-          submitBtn.disabled = false;
-          submitBtn.innerText = "Enviar Preinscripció (20 €)";
-          alertError.innerText = "Error en la verificació antispam de reCAPTCHA.";
-          alertError.classList.remove('hidden');
-        });
-      });
+    MailApp.sendEmail(data.email, assumpte, cosText, {
+      replyTo: "comunicacio@accucat.org"
     });
-  </script>
+  }
 
-</body>
-</html>
+  return ContentService.createTextOutput(JSON.stringify({ success: true, message: 'Inscripció desada i correu enviat', id: nouID }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function obtenirInscripcions() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = obtenirFullActiu(ss);
+  const values = sheet.getDataRange().getValues();
+  
+  return ContentService.createTextOutput(JSON.stringify({ success: true, data: values }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function canviarEstatInscripcio(id, nouEstat) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = obtenirFullActiu(ss);
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === id) { 
+      sheet.getRange(i + 1, 9).setValue(nouEstat); 
+      break;
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({ success: true, message: 'Estat actualitzat' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
