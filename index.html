@@ -4,10 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preinscripció — II Trobada ACCU Catalunya</title>
-  
-  <!-- Carrega oficial de Google reCAPTCHA v3 -->
-  <script src="https://www.google.com/recaptcha/api.js?render=6Ldh0ogsAAAAAA51XBERJe51dEQoStsWCrVTTiux"></script>
-
   <style>
     * {
       box-sizing: border-box;
@@ -105,17 +101,6 @@
       color: #991b1b;
       border: 1px solid #fecaca;
     }
-    .captcha-notice {
-      font-size: 11px;
-      color: #888;
-      text-align: center;
-      margin-top: 18px;
-      line-height: 1.4;
-    }
-    .captcha-notice a {
-      color: #6B21A8;
-      text-decoration: none;
-    }
   </style>
 </head>
 <body>
@@ -162,19 +147,12 @@
     </div>
 
     <button type="submit" id="submitBtn" class="btn-submit">Enviar Preinscripció (20 €)</button>
-
-    <p class="captcha-notice">
-      Aquest lloc està protegit per reCAPTCHA i s'apliquen la 
-      <a href="https://policies.google.com/privacy" target="_blank">Política de Privadesa</a> i els 
-      <a href="https://policies.google.com/terms" target="_blank">Termes del Servei</a> de Google.
-    </p>
   </form>
 </div>
 
 <script>
-  // URL del teu Web App desplegat a Google Apps Script
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec"; // <-- Assegura't que conté la teva ID completa finalitzada en /exec
-  const RECAPTCHA_SITE_KEY = "6Ldh0ogsAAAAAA51XBERJe51dEQoStsWCrVTTiux";
+  // URL del desplegament web de Google Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec"; // <-- La teva URL completa finalitzada en /exec
 
   const form = document.getElementById('inscriptionForm');
   const submitBtn = document.getElementById('submitBtn');
@@ -187,64 +165,48 @@
     alertSuccess.style.display = 'none';
     alertError.style.display = 'none';
     submitBtn.disabled = true;
-    submitBtn.innerText = "Validant i enviant...";
+    submitBtn.innerText = "Enviant preinscripció...";
 
-    // Execució del reCAPTCHA v3
-    grecaptcha.ready(function() {
-      grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'inscriure' }).then(function(token) {
-        
-        // Recopilació de dades del formulari
-        const payload = {
-          action: 'inscriure',
-          recaptchaToken: token,
-          data: {
-            nomCognoms: document.getElementById('nomCognoms').value,
-            nif: document.getElementById('nif').value,
-            email: document.getElementById('email').value,
-            telefono: document.getElementById('telefono').value,
-            socio: document.getElementById('socio').value,
-            dataNaixement: document.getElementById('dataNaixement').value,
-            totalPreu: 20
-          }
-        };
+    const payload = {
+      action: 'inscriure',
+      data: {
+        nomCognoms: document.getElementById('nomCognoms').value,
+        nif: document.getElementById('nif').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        socio: document.getElementById('socio').value,
+        dataNaixement: document.getElementById('dataNaixement').value,
+        totalPreu: 20
+      }
+    };
 
-        // Enviament de dades cap a Google Apps Script
-        fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(result => {
-          submitBtn.disabled = false;
-          submitBtn.innerText = "Enviar Preinscripció (20 €)";
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(result => {
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Enviar Preinscripció (20 €)";
 
-          if (result.success) {
-            alertSuccess.innerText = "Gràcies! Hem rebut la teva preinscripció (" + result.id + "). T'hem enviat un correu amb les instruccions de pagament.";
-            alertSuccess.style.display = 'block';
-            form.reset();
-          } else {
-            alertError.innerText = "Error: " + (result.error || "No s'ha pogut processar la inscripció.");
-            alertError.style.display = 'block';
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          submitBtn.disabled = false;
-          submitBtn.innerText = "Enviar Preinscripció (20 €)";
-          alertError.innerText = "S'ha produït un error de connexió amb el servidor.";
-          alertError.style.display = 'block';
-        });
-
-      }).catch(function(err) {
-        console.error(err);
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Enviar Preinscripció (20 €)";
-        alertError.innerText = "Error en la verificació antispam de reCAPTCHA.";
+      if (result.success) {
+        alertSuccess.innerText = "Gràcies! Hem rebut la teva preinscripció (" + result.id + "). T'hem enviat un correu amb les instruccions de pagament.";
+        alertSuccess.style.display = 'block';
+        form.reset();
+      } else {
+        alertError.innerText = "Error: " + (result.error || "No s'ha pogut processar la inscripció.");
         alertError.style.display = 'block';
-      });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Enviar Preinscripció (20 €)";
+      alertError.innerText = "S'ha produït un error de connexió amb el servidor.";
+      alertError.style.display = 'block';
     });
   });
 </script>
